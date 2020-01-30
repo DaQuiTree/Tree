@@ -9,25 +9,21 @@ static familyTreeT NewFamilyTree(string anster)
 
     tree->name = anster;
     tree->children = NULL;
-    tree->childNum = 0;
+    tree->brothers = NULL;
 
     return tree;
 }
 
 static familyNodeT *FindNode(familyTreeT tptr, string name)
 {
+    if(tptr == NULL)return NULL;
     if(tptr->name == name)return tptr;
-    for(int i = 0; i < tptr->childNum; i++)
-    {
-        familyNodeT *tTree;
-        tTree = FindNode(tptr->children[i], name);
-        if(tTree == NULL)
-            continue;
-        else
-            return tTree;
-    }
-
-    return NULL;
+    familyNodeT *tTree;
+    tTree = FindNode(tptr->children, name);
+    if(tTree == NULL)
+        return(FindNode(tptr->brothers, name));
+    else
+        return tTree;
 }
 
 static void InsertNode(familyTreeT tptr, string name, string parent)
@@ -41,16 +37,18 @@ static void InsertNode(familyTreeT tptr, string name, string parent)
         member = new familyNodeT;
         member->name = name;
         member->children = NULL;
+        member->brothers = NULL;
+        
+        /*parents have children already*/
+        if(paTree->children != NULL){
+            familyNodeT *endBro = paTree->children;
+            while(endBro->brothers != NULL) 
+                endBro = endBro->brothers;
+            endBro->brothers = member;
+        }else{
+            paTree->children = member;
+        }
 
-        /*enlarge*/
-        newHouse = new familyTreeT[paTree->childNum+1];
-        int i;
-        for(i = 0; i < paTree->childNum; i++)
-            newHouse[i] = paTree->children[i];
-        newHouse[i] = member;
-        delete []paTree->children;
-        paTree->children = newHouse;
-        paTree->childNum++;
     }
 }
 
@@ -67,8 +65,7 @@ familyTreeT ReadFamilyTree(string filename)
     getline(ifs, line);
     familyTreeT tree = NewFamilyTree(line);
 
-    while(getline(ifs, line)){
-        string child = line.substr(0, line.find(':'));
+    while(getline(ifs, line)){ string child = line.substr(0, line.find(':'));
         string parent = line.substr(line.find(':')+1);
         cout << "child: " << child << "   parent: " << parent << endl;
         InsertNode(tree, child, parent);
@@ -85,10 +82,9 @@ void WalkingFamily(familyTreeT tree)
         for(int i = 0; i < 2*depth; i++)
             cout << " ";
         cout << tree->name << endl;
-        for(int i = 0; i < tree->childNum; i++){
-            depth++;
-            WalkingFamily(tree->children[i]);
-            depth--;
-        }
+        WalkingFamily(tree->brothers);
+        depth++;
+        WalkingFamily(tree->children);
+        depth--;
     }
 }

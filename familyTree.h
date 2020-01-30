@@ -9,8 +9,8 @@ using namespace std;
 
 typedef struct familyNodeT{
     string name;
-    int childNum;
-    struct familyNodeT **children;
+    struct familyNodeT *children;
+    struct familyNodeT *brothers;
 }familyNodeT, *familyTreeT;
 
 familyTreeT ReadFamilyTree(string filename);
