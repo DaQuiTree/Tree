@@ -8,20 +8,16 @@ static familyTreeT NewFamilyTree(string anster)
     familyTreeT tree = new familyNodeT;
 
     tree->name = anster;
-    for(int i = 0; i < MaxChildren; i++)
-    {
-        tree->children[i] = NULL;
-    }
+    tree->children = NULL;
+    tree->childNum = 0;
 
     return tree;
 }
 
 static familyNodeT *FindNode(familyTreeT tptr, string name)
 {
-    if(tptr == NULL)return NULL;
     if(tptr->name == name)return tptr;
-
-    for(int i = 0; i < MaxChildren; i++)
+    for(int i = 0; i < tptr->childNum; i++)
     {
         familyNodeT *tTree;
         tTree = FindNode(tptr->children[i], name);
@@ -38,18 +34,23 @@ static void InsertNode(familyTreeT tptr, string name, string parent)
 {
     familyTreeT paTree;
     familyNodeT *member;
+    familyNodeT **newHouse;
 
     if((paTree = FindNode(tptr, parent)) != NULL){
-        for(int i = 0; i < MaxChildren; i++){
-            if(paTree->children[i] == NULL){
-                member = new familyNodeT;
-                member->name = name;
-                for(int j = 0; j < MaxChildren; j++)
-                    member->children[j] = NULL;
-                paTree->children[i] = member;
-                return;
-            }
-        }
+        /*new one*/
+        member = new familyNodeT;
+        member->name = name;
+        member->children = NULL;
+
+        /*enlarge*/
+        newHouse = new familyTreeT[paTree->childNum+1];
+        int i;
+        for(i = 0; i < paTree->childNum; i++)
+            newHouse[i] = paTree->children[i];
+        newHouse[i] = member;
+        delete []paTree->children;
+        paTree->children = newHouse;
+        paTree->childNum++;
     }
 }
 
@@ -84,7 +85,7 @@ void WalkingFamily(familyTreeT tree)
         for(int i = 0; i < 2*depth; i++)
             cout << " ";
         cout << tree->name << endl;
-        for(int i = 0; i < MaxChildren; i++){
+        for(int i = 0; i < tree->childNum; i++){
             depth++;
             WalkingFamily(tree->children[i]);
             depth--;
