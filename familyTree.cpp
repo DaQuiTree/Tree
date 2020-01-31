@@ -3,7 +3,7 @@
 #include <string>
 #include "familyTree.h"
 
-static familyTreeT NewFamilyTree(string anster)
+familyTreeT NewFamilyTree(string anster)
 {
     familyTreeT tree = new familyNodeT;
 
@@ -14,7 +14,7 @@ static familyTreeT NewFamilyTree(string anster)
     return tree;
 }
 
-static familyNodeT *FindNode(familyTreeT tptr, string name)
+familyNodeT *FindNode(familyTreeT tptr, string name)
 {
     if(tptr == NULL)return NULL;
     if(tptr->name == name)return tptr;
@@ -26,11 +26,23 @@ static familyNodeT *FindNode(familyTreeT tptr, string name)
         return tTree;
 }
 
-static void InsertNode(familyTreeT tptr, string name, string parent)
+familyNodeT *FindParentNode(familyTreeT tptr, string name)
+{
+    if(tptr == NULL)return NULL;
+    if(tptr->children == NULL)return NULL;
+    if(tptr->children->name == name)return tptr;
+    familyNodeT *tTree;
+    tTree = FindParentNode(tptr->children, name);
+    if(tTree == NULL)
+        return(FindParentNode(tptr->brothers, name));
+    else
+        return tTree;
+}
+
+familyTreeT InsertNode(familyTreeT tptr, string name, string parent)
 {
     familyTreeT paTree;
     familyNodeT *member;
-    familyNodeT **newHouse;
 
     if((paTree = FindNode(tptr, parent)) != NULL){
         /*new one*/
@@ -45,10 +57,11 @@ static void InsertNode(familyTreeT tptr, string name, string parent)
             while(endBro->brothers != NULL) 
                 endBro = endBro->brothers;
             endBro->brothers = member;
+            return(endBro->brothers);
         }else{
             paTree->children = member;
+            return(paTree->children);
         }
-
     }
 }
 

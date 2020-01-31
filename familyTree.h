@@ -15,5 +15,9 @@ typedef struct familyNodeT{
 
 familyTreeT ReadFamilyTree(string filename);
 void WalkingFamily(familyTreeT tree);
+familyNodeT *FindNode(familyTreeT tptr, string name);
+familyNodeT *FindParentNode(familyTreeT tptr, string name);
+familyTreeT NewFamilyTree(string anster);
+familyTreeT InsertNode(familyTreeT tptr, string name, string parent);
 
 #endif
